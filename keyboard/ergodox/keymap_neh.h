@@ -54,8 +54,8 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                 TRNS, TRNS, TRNS,
         // right hand
               NO, TRNS, TRNS, TRNS, TRNS, TRNS,   NO,
-            TRNS, FN23, HOME, PGDN, PGUP,  END,   NO,
-                  FN21, LEFT, DOWN,   UP,RIGHT,   NO,
+            TRNS, FN23, TRNS, TRNS, TRNS, TRNS,   NO,
+                  FN21, FN10, FN12, FN13, FN11,   NO,
             TRNS, RBRC, FN31, FN19,   NO,   NO,   NO,
                         TRNS, TRNS,   NO,   NO,   NO,
               NO, TRNS,
@@ -195,10 +195,13 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* id for user defined functions */
 enum function_id {
     TEENSY_KEY,
+    SHIFT_LEFT_HOME,
+    SHIFT_RIGHT_END,
+    SHIFT_DOWN_PGDN,
+    SHIFT_UP_PGUP,
 };
 
 enum macro_id {
-    LEFT_OR_HOME,
     LSHIFT_LEFT,
 };
 
@@ -217,7 +220,10 @@ static const uint16_t PROGMEM fn_actions[] = {
     [8] = ACTION_MODS_TAP_KEY(MOD_LCTL, KC_BSPACE),       // FN8 - hold=ctrl, tap=bkspc
     [9] = ACTION_MODS_TAP_KEY(MOD_LSFT, KC_ENTER),        // FN9 - hold=shift, tap=enter
 
-    [10] = ACTION_MACRO_TAP(LEFT_OR_HOME),                // Macro: LShift with tap ')'
+    [10] = ACTION_FUNCTION(SHIFT_LEFT_HOME),              // Shift + Left: Home
+    [11] = ACTION_FUNCTION(SHIFT_RIGHT_END),              // Shift + Right: End
+    [12] = ACTION_FUNCTION(SHIFT_DOWN_PGDN),              // Shift + Down: PgDn
+    [13] = ACTION_FUNCTION(SHIFT_UP_PGUP),                // Shift + Up: PgUp
 
     [19] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),             // ~
 
@@ -236,17 +242,112 @@ static const uint16_t PROGMEM fn_actions[] = {
     [31] = ACTION_MODS_KEY(MOD_LSFT, KC_SLSH),            // ?
 };
 
-void action_function(keyrecord_t *event, uint8_t id, uint8_t opt)
+void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-    print("action_function called\n");
-    print("id  = "); phex(id); print("\n");
-    print("opt = "); phex(opt); print("\n");
-    if (id == TEENSY_KEY) {
-        clear_keyboard();
-        print("\n\nJump to bootloader... ");
-        _delay_ms(250);
-        bootloader_jump(); // should not return
-        print("not supported.\n");
+#   define MODS_CTRL_MASK   (MOD_BIT(KC_LCTRL)|MOD_BIT(KC_RCTRL))
+    static uint8_t shift_pressed;
+#   define MODS_SHIFT_MASK   (MOD_BIT(KC_LSHIFT)|MOD_BIT(KC_RSHIFT))
+
+    switch (id) {
+        case SHIFT_LEFT_HOME:
+            shift_pressed = get_mods()&MODS_SHIFT_MASK;
+            if (record->event.pressed) {
+                if (shift_pressed) {
+                    del_mods(shift_pressed);   // remove Mod
+                    add_key(KC_HOME);
+                    send_keyboard_report(); // send key without Mod
+                    add_mods(shift_pressed);   // return Mod but not sent
+                } else {
+                    add_key(KC_LEFT);
+                    send_keyboard_report();
+                }
+            } else {
+                if (shift_pressed) {
+                    del_key(KC_HOME);
+                    send_keyboard_report();
+                } else {
+                    del_key(KC_LEFT);
+                    send_keyboard_report();
+                }
+            }
+            break;
+
+        case SHIFT_RIGHT_END:
+            shift_pressed = get_mods()&MODS_SHIFT_MASK;
+            if (record->event.pressed) {
+                if (shift_pressed) {
+                    del_mods(shift_pressed);   // remove Mod
+                    add_key(KC_END);
+                    send_keyboard_report(); // send key without Mod
+                    add_mods(shift_pressed);   // return Mod but not sent
+                } else {
+                    add_key(KC_RIGHT);
+                    send_keyboard_report();
+                }
+            } else {
+                if (shift_pressed) {
+                    del_key(KC_END);
+                    send_keyboard_report();
+                } else {
+                    del_key(KC_RIGHT);
+                    send_keyboard_report();
+                }
+            }
+            break;
+
+        case SHIFT_DOWN_PGDN:
+            shift_pressed = get_mods()&MODS_SHIFT_MASK;
+            if (record->event.pressed) {
+                if (shift_pressed) {
+                    del_mods(shift_pressed);   // remove Mod
+                    add_key(KC_PGDN);
+                    send_keyboard_report(); // send key without Mod
+                    add_mods(shift_pressed);   // return Mod but not sent
+                } else {
+                    add_key(KC_DOWN);
+                    send_keyboard_report();
+                }
+            } else {
+                if (shift_pressed) {
+                    del_key(KC_PGDN);
+                    send_keyboard_report();
+                } else {
+                    del_key(KC_DOWN);
+                    send_keyboard_report();
+                }
+            }
+            break;
+
+        case SHIFT_UP_PGUP:
+            shift_pressed = get_mods()&MODS_SHIFT_MASK;
+            if (record->event.pressed) {
+                if (shift_pressed) {
+                    del_mods(shift_pressed);   // remove Mod
+                    add_key(KC_PGUP);
+                    send_keyboard_report(); // send key without Mod
+                    add_mods(shift_pressed);   // return Mod but not sent
+                } else {
+                    add_key(KC_UP);
+                    send_keyboard_report();
+                }
+            } else {
+                if (shift_pressed) {
+                    del_key(KC_PGUP);
+                    send_keyboard_report();
+                } else {
+                    del_key(KC_UP);
+                    send_keyboard_report();
+                }
+            }
+            break;
+
+        case TEENSY_KEY:
+            clear_keyboard();
+            print("\n\nJump to bootloader... ");
+            _delay_ms(250);
+            bootloader_jump(); // should not return
+            print("not supported.\n");
+            break;
     }
 }
 
@@ -259,15 +360,6 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
     tap_t tap = record->tap;
 
     switch (id) {
-        case LEFT_OR_HOME:
-            if (event.pressed) {
-                //return (event.shifted ?
-                        //MACRO( D(HOME), U(HOME), END ) :
-                        //MACRO( D(LEFT), U(LEFT), END ) );
-                return MACRO_NONE;
-            } else {
-                return MACRO_NONE;
-            }
         case LSHIFT_LEFT:
             if (tap.count > 0 && !tap.interrupted) {
                 return (event.pressed ?
