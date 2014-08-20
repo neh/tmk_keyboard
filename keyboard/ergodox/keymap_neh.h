@@ -216,6 +216,38 @@ static const uint16_t PROGMEM fn_actions[] = {
     [31] = ACTION_MODS_KEY(MOD_LSFT, KC_SLSH),            // ?
 };
 
+void neh_hotkey(keyrecord_t *record, action_t action)
+{
+    keyevent_t event = record->event;
+
+    switch (action.kind.id) {
+        case ACT_LMODS:
+        case ACT_RMODS:
+            {
+                uint8_t mods = (action.kind.id == ACT_LMODS) ? action.key.mods :
+                                                                action.key.mods<<4;
+
+                if (event.pressed) {
+                    if (mods) {
+                        add_weak_mods(mods);
+                        send_keyboard_report();
+                    }
+                    register_code(action.key.code);
+                } else {
+                    unregister_code(action.key.code);
+                    if (mods) {
+                        del_weak_mods(mods);
+                        send_keyboard_report();
+                    }
+                }
+            }
+            break;
+        default:
+            print("Not supported.\n");
+            break;
+    }
+}
+
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
     keyevent_t event = record->event;
@@ -247,29 +279,7 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
             action.code = ACTION_KEY(keycode);
             action.key.mods = 0;
             del_mods(MOD_LSFT | MOD_RSFT);
-            switch (action.kind.id) {
-                case ACT_LMODS:
-                case ACT_RMODS:
-                    {
-                        uint8_t mods = (action.kind.id == ACT_LMODS) ? action.key.mods :
-                                                                       action.key.mods<<4;
-
-                        if (event.pressed) {
-                            if (mods) {
-                                add_weak_mods(mods);
-                                send_keyboard_report();
-                            }
-                            register_code(action.key.code);
-                        } else {
-                            unregister_code(action.key.code);
-                            if (mods) {
-                                del_weak_mods(mods);
-                                send_keyboard_report();
-                            }
-                        }
-                    }
-                    break;
-            }
+            neh_hotkey(record, action);
             set_mods(savedmods);
             break;
 
