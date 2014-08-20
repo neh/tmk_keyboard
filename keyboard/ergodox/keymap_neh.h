@@ -55,7 +55,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // right hand
               NO, TRNS, TRNS, TRNS, TRNS, TRNS,   NO,
             TRNS, FN23, TRNS, TRNS, TRNS, TRNS,   NO,
-                  FN21, FN10, FN12, FN13, FN11,   NO,
+                  FN21, FN10, FN10, FN10, FN10,   NO,
             TRNS, RBRC, FN31, FN19,   NO,   NO,   NO,
                         TRNS, TRNS,   NO,   NO,   NO,
               NO, TRNS,
@@ -195,10 +195,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 /* id for user defined functions */
 enum function_id {
     TEENSY_KEY,
-    SHIFT_LEFT_HOME,
-    SHIFT_RIGHT_END,
-    SHIFT_DOWN_PGDN,
-    SHIFT_UP_PGUP,
+    SHIFTED_ARROW,
 };
 
 enum macro_id {
@@ -220,10 +217,7 @@ static const uint16_t PROGMEM fn_actions[] = {
     [8] = ACTION_MODS_TAP_KEY(MOD_LCTL, KC_BSPACE),       // FN8 - hold=ctrl, tap=bkspc
     [9] = ACTION_MODS_TAP_KEY(MOD_LSFT, KC_ENTER),        // FN9 - hold=shift, tap=enter
 
-    [10] = ACTION_FUNCTION(SHIFT_LEFT_HOME),              // Shift + Left: Home
-    [11] = ACTION_FUNCTION(SHIFT_RIGHT_END),              // Shift + Right: End
-    [12] = ACTION_FUNCTION(SHIFT_DOWN_PGDN),              // Shift + Down: PgDn
-    [13] = ACTION_FUNCTION(SHIFT_UP_PGUP),                // Shift + Up: PgUp
+    [10] = ACTION_FUNCTION(SHIFTED_ARROW),                // Shift + Arrows = special
 
     [19] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),             // ~
 
@@ -244,101 +238,59 @@ static const uint16_t PROGMEM fn_actions[] = {
 
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
-#   define MODS_CTRL_MASK   (MOD_BIT(KC_LCTRL)|MOD_BIT(KC_RCTRL))
-    static uint8_t shift_pressed;
-#   define MODS_SHIFT_MASK   (MOD_BIT(KC_LSHIFT)|MOD_BIT(KC_RSHIFT))
+    keyevent_t event = record->event;
+
+    uint8_t col = event.key.col;
+    uint8_t row = event.key.row;
+    uint8_t savedmods = get_mods();
+    uint8_t shift_pressed = (savedmods & (MOD_LSFT | MOD_RSFT));
+
+    action_t action = { .code = ACTION_NO };
+    uint8_t keycode = KC_NO;
 
     switch (id) {
-        case SHIFT_LEFT_HOME:
-            shift_pressed = get_mods()&MODS_SHIFT_MASK;
-            if (record->event.pressed) {
-                if (shift_pressed) {
-                    del_mods(shift_pressed);   // remove Mod
-                    add_key(KC_HOME);
-                    send_keyboard_report(); // send key without Mod
-                    add_mods(shift_pressed);   // return Mod but not sent
-                } else {
-                    add_key(KC_LEFT);
-                    send_keyboard_report();
-                }
-            } else {
-                if (shift_pressed) {
-                    del_key(KC_HOME);
-                    send_keyboard_report();
-                } else {
-                    del_key(KC_LEFT);
-                    send_keyboard_report();
-                }
+        case SHIFTED_ARROW:
+            switch (row) {
+                case 9:
+                    keycode = shift_pressed ? KC_HOME : KC_LEFT;
+                    break;
+                case 10:
+                    keycode = shift_pressed ? KC_PGDN : KC_DOWN;
+                    break;
+                case 11:
+                    keycode = shift_pressed ? KC_PGUP : KC_UP;
+                    break;
+                case 12:
+                    keycode = shift_pressed ? KC_END : KC_RIGHT;
+                    break;
             }
-            break;
+            action.code = ACTION_KEY(keycode);
+            action.key.mods = 0;
+            del_mods(MOD_LSFT | MOD_RSFT);
+            switch (action.kind.id) {
+                case ACT_LMODS:
+                case ACT_RMODS:
+                    {
+                        uint8_t mods = (action.kind.id == ACT_LMODS) ? action.key.mods :
+                                                                       action.key.mods<<4;
 
-        case SHIFT_RIGHT_END:
-            shift_pressed = get_mods()&MODS_SHIFT_MASK;
-            if (record->event.pressed) {
-                if (shift_pressed) {
-                    del_mods(shift_pressed);   // remove Mod
-                    add_key(KC_END);
-                    send_keyboard_report(); // send key without Mod
-                    add_mods(shift_pressed);   // return Mod but not sent
-                } else {
-                    add_key(KC_RIGHT);
-                    send_keyboard_report();
-                }
-            } else {
-                if (shift_pressed) {
-                    del_key(KC_END);
-                    send_keyboard_report();
-                } else {
-                    del_key(KC_RIGHT);
-                    send_keyboard_report();
-                }
+                        if (event.pressed) {
+                            if (mods) {
+                                add_weak_mods(mods);
+                                send_keyboard_report();
+                            }
+                            register_code(action.key.code);
+                        } else {
+                            unregister_code(action.key.code);
+                            if (mods) {
+                                del_weak_mods(mods);
+                                send_keyboard_report();
+                            }
+                        }
+                    }
+                    break;
             }
-            break;
-
-        case SHIFT_DOWN_PGDN:
-            shift_pressed = get_mods()&MODS_SHIFT_MASK;
-            if (record->event.pressed) {
-                if (shift_pressed) {
-                    del_mods(shift_pressed);   // remove Mod
-                    add_key(KC_PGDN);
-                    send_keyboard_report(); // send key without Mod
-                    add_mods(shift_pressed);   // return Mod but not sent
-                } else {
-                    add_key(KC_DOWN);
-                    send_keyboard_report();
-                }
-            } else {
-                if (shift_pressed) {
-                    del_key(KC_PGDN);
-                    send_keyboard_report();
-                } else {
-                    del_key(KC_DOWN);
-                    send_keyboard_report();
-                }
-            }
-            break;
-
-        case SHIFT_UP_PGUP:
-            shift_pressed = get_mods()&MODS_SHIFT_MASK;
-            if (record->event.pressed) {
-                if (shift_pressed) {
-                    del_mods(shift_pressed);   // remove Mod
-                    add_key(KC_PGUP);
-                    send_keyboard_report(); // send key without Mod
-                    add_mods(shift_pressed);   // return Mod but not sent
-                } else {
-                    add_key(KC_UP);
-                    send_keyboard_report();
-                }
-            } else {
-                if (shift_pressed) {
-                    del_key(KC_PGUP);
-                    send_keyboard_report();
-                } else {
-                    del_key(KC_UP);
-                    send_keyboard_report();
-                }
-            }
+            set_mods(savedmods);
             break;
 
         case TEENSY_KEY:
