@@ -15,7 +15,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             BSPC,    F,    G,    C,    R,    L,   NO,
                      D,    H,    T,    N,    S, MINS,
              ENT,    B,    M,    W,    V,    Z,   NO,
-                        LGUI,  FN3,   NO,   NO,  F12,
+                        LGUI,  FN3,   NO,   NO,   NO,
               NO,  INS,
               NO,
             LALT,  FN8,  FN4
@@ -23,7 +23,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     KEYMAP(  // layout: layer 1: Punctuation
         // left hand
-          NO, TRNS, TRNS, TRNS, TRNS, TRNS,   NO,
+        WAKE, TRNS, TRNS, TRNS, TRNS, TRNS,   NO,
         TRNS, FN24, FN25, FN26,  EQL, FN22, TRNS,
           NO, FN27, BSLS, SLSH, MINS, FN20,
           NO, FN28,  GRV, FN29, FN30, LBRC, TRNS,
@@ -32,8 +32,8 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                               NO,
                                 TRNS, TRNS, TRNS,
         // right hand
-              NO, TRNS, TRNS, TRNS, TRNS, TRNS,   NO,
-            TRNS, FN23, TRNS, TRNS, TRNS, TRNS,   NO,
+              NO, TRNS, TRNS, TRNS, TRNS, TRNS, SLEP,
+            TRNS, FN23, TRNS, TRNS, TRNS, TRNS, FN11,
                   FN21, FN10, FN10, FN10, FN10,   NO,
             TRNS, RBRC, FN31, FN19,   NO,   NO,   NO,
                         TRNS, TRNS,   NO,   NO,   NO,
@@ -197,6 +197,7 @@ static const uint16_t PROGMEM fn_actions[] = {
     [9] = ACTION_MODS_TAP_KEY(MOD_LSFT, KC_ENTER),        // FN9 - hold=shift, tap=enter
 
     [10] = ACTION_FUNCTION(SHIFTED_ARROW),                // Shift + Arrows = special
+    [11] = ACTION_MODS_KEY(MOD_LGUI, KC_F12),             // Mod-F12
 
     [19] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),             // ~
 
