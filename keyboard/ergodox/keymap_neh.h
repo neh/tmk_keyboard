@@ -23,7 +23,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     KEYMAP(  // layout: layer 0: default
         // left hand
-         GRV,    1,    2,    3,    4,    5,   NO,
+          NO,    1,    2,    3,    4,    5,   NO,
          TAB, QUOT, COMM,  DOT,    P,    Y,  TAB,
         VOLU,    A,    O,    E,    U,    I,
         VOLD, SCLN,    Q,    J,    K,    X,  ENT,
@@ -32,8 +32,8 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                               NO,
                                  FN9,  FN6,  FN1,
         // right hand
-              NO,    6,    7,    8,    9,    0,  EQL,
-            BSPC,    F,    G,    C,    R,    L, SLSH,
+              NO,    6,    7,    8,    9,    0,   NO,
+            BSPC,    F,    G,    C,    R,    L,   NO,
                      D,    H,    T,    N,    S, MINS,
              ENT,    B,    M,    W,    V,    Z,   NO,
                         LGUI,  FN3,   NO,   NO,   NO,
