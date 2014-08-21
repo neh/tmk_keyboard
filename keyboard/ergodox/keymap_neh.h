@@ -23,18 +23,18 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
     KEYMAP(  // layout: layer 1: Punctuation
         // left hand
-        WAKE, TRNS, TRNS, TRNS, TRNS, TRNS,   NO,
-        TRNS, FN24, FN25, FN26,  EQL, FN22, TRNS,
+        WAKE, FN12, FN12, FN12, FN12, FN12,   NO,
+        TRNS, FN12, FN12, FN12,  EQL, FN22, TRNS,
           NO, FN27, BSLS, SLSH, MINS, FN20,
-          NO, FN28,  GRV, FN29, FN30, LBRC, TRNS,
+          NO, FN12,  GRV, FN29, FN30, LBRC, TRNS,
           NO,   NO,   NO, TRNS, TRNS,
                                       TRNS,   NO,
                                               NO,
                                 TRNS, TRNS, TRNS,
         // right hand
-              NO, TRNS, TRNS, TRNS, TRNS, TRNS, SLEP,
+              NO, FN12, FN12, FN12, FN12, FN12, SLEP,
             TRNS, FN23, TRNS, TRNS, TRNS, TRNS, FN11,
-                  FN21, FN10, FN10, FN10, FN10,   NO,
+                  FN21, FN10, FN10, FN10, FN10, FN12,
             TRNS, RBRC, FN31, FN19,   NO,   NO,   NO,
                         TRNS, TRNS,   NO,   NO,   NO,
               NO, TRNS,
@@ -175,6 +175,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 enum function_id {
     TEENSY_KEY,
     SHIFTED_ARROW,
+    SHIFTED_KEY,
 };
 
 enum macro_id {
@@ -198,6 +199,7 @@ static const uint16_t PROGMEM fn_actions[] = {
 
     [10] = ACTION_FUNCTION(SHIFTED_ARROW),                // Shift + Arrows = special
     [11] = ACTION_MODS_KEY(MOD_LGUI, KC_F12),             // Mod-F12
+    [12] = ACTION_FUNCTION(SHIFTED_KEY),                  // Shift + Arrows = special
 
     [19] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),             // ~
 
@@ -206,11 +208,7 @@ static const uint16_t PROGMEM fn_actions[] = {
     [22] = ACTION_MODS_KEY(MOD_LSFT, KC_LBRC),            // {
     [23] = ACTION_MODS_KEY(MOD_LSFT, KC_RBRC),            // }
 
-    [24] = ACTION_MODS_KEY(MOD_LSFT, KC_QUOT),            // "
-    [25] = ACTION_MODS_KEY(MOD_LSFT, KC_COMM),            // <
-    [26] = ACTION_MODS_KEY(MOD_LSFT, KC_DOT),             // >
     [27] = ACTION_MODS_KEY(MOD_LSFT, KC_EQL),             // +
-    [28] = ACTION_MODS_KEY(MOD_LSFT, KC_SCLN),            // :
     [29] = ACTION_MODS_KEY(MOD_LSFT, KC_BSLS),            // pipe
     [30] = ACTION_MODS_KEY(MOD_LSFT, KC_MINS),            // _
     [31] = ACTION_MODS_KEY(MOD_LSFT, KC_SLSH),            // ?
@@ -281,6 +279,96 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
             del_mods(MOD_LSFT | MOD_RSFT);
             neh_hotkey(record, action);
             set_mods(savedmods);
+            break;
+
+        case SHIFTED_KEY:
+            if (col == 0) {
+                switch (row) {
+                    case 1:
+                        keycode = KC_1;
+                        break;
+                    case 2:
+                        keycode = KC_2;
+                        break;
+                    case 3:
+                        keycode = KC_3;
+                        break;
+                    case 4:
+                        keycode = KC_4;
+                        break;
+                    case 5:
+                        keycode = KC_5;
+                        break;
+                    case 8:
+                        keycode = KC_6;
+                        break;
+                    case 9:
+                        keycode = KC_7;
+                        break;
+                    case 10:
+                        keycode = KC_8;
+                        break;
+                    case 11:
+                        keycode = KC_9;
+                        break;
+                    case 12:
+                        keycode = KC_0;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (col == 1) {
+                switch (row) {
+                    case 1:
+                        keycode = KC_QUOT;
+                        break;
+                    case 2:
+                        keycode = KC_COMM;
+                        break;
+                    case 3:
+                        keycode = KC_DOT;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (col == 2) {
+                switch (row) {
+                    case 13:
+                        keycode = KC_MINS;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (col == 3) {
+                switch (row) {
+                    case 1:
+                        keycode = KC_SCLN;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            if (keycode != KC_NO) {
+                action.code = ACTION_MODS_KEY(MOD_LSFT, keycode);
+            }
+            if (action.code != ACTION_NO) {
+                if (shift_pressed) {
+                    action.key.mods = 0;
+                    del_mods(MOD_LSFT | MOD_RSFT);
+                }
+                neh_hotkey(record, action);
+                if (shift_pressed) {
+                    set_mods(savedmods);
+                }
+            }
+
             break;
 
         case TEENSY_KEY:
