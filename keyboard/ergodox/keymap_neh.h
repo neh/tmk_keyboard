@@ -6,7 +6,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          TAB, QUOT, COMM,  DOT,    P,    Y,  TAB,
         VOLU,    A,    O,    E,    U,    I,
         VOLD, SCLN,    Q,    J,    K,    X,  ENT,
-        MUTE,   NO,   NO,  FN3, LGUI,
+        MUTE,   NO,  FN2,  FN3, LGUI,
                                        DEL,  FN5,
                                               NO,
                                  FN9,  FN6,  FN1,
@@ -33,7 +33,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                 TRNS, TRNS, TRNS,
         // right hand
               NO, FN12, FN12, FN12, FN12, FN12, SLEP,
-            TRNS, FN23, TRNS, TRNS, TRNS, TRNS, FN11,
+            TRNS, FN23,   NO,   NO,   NO,   NO, FN11,
                   FN21, FN10, FN10, FN10, FN10, FN12,
             TRNS, RBRC, FN31, FN19,   NO,   NO,   NO,
                         TRNS, TRNS,   NO,   NO,   NO,
@@ -42,22 +42,22 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             TRNS, TRNS, TRNS
     ),
 
-    KEYMAP(  // layout: layer 2: mouse + numpad
+    KEYMAP(  // layout: layer 2: mouse
         // left hand
-        TRNS,   NO,   NO,   NO,   NO, PAUS, PSCR,
-        TRNS, WH_L, WH_U, WH_D, WH_R, BTN2, TRNS,
-        TRNS, MS_L, MS_U, MS_D, MS_R, BTN1,
-        TRNS,   NO,   NO,   NO,   NO, BTN3, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+        TRNS, WH_L, WH_U, WH_D, WH_R, TRNS, TRNS,
+        TRNS, MS_L, MS_U, MS_D, MS_R, TRNS,
+        TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
         TRNS, TRNS, TRNS, TRNS, TRNS,
                                       TRNS, TRNS,
                                             TRNS,
                                 TRNS, TRNS, TRNS,
         // right hand
-            SLCK, NLCK, PSLS, PAST, PAST, PMNS, BSPC,
-            TRNS,   NO,   P7,   P8,   P9, PMNS, BSPC,
-                    NO,   P4,   P5,   P6, PPLS, PENT,
-            TRNS,   NO,   P1,   P2,   P3, PPLS, PENT,
-                          P0, PDOT, SLSH, PENT, PENT,
+            TRNS, TRNS, TRNS, TRNS, TRNS, TRNS, TRNS,
+            TRNS,   NO, BTN1, BTN2, BTN3, TRNS, TRNS,
+                    NO, MS_L, MS_D, MS_U, MS_R, TRNS,
+            TRNS,   NO, TRNS, TRNS, TRNS, TRNS, TRNS,
+                        TRNS, TRNS, TRNS, TRNS, TRNS,
             TRNS, TRNS,
             TRNS,
             TRNS, TRNS, TRNS
@@ -188,7 +188,7 @@ enum macro_id {
 static const uint16_t PROGMEM fn_actions[] = {
     [0] = ACTION_DEFAULT_LAYER_SET(0),                    // FN0 - switch to Layer0
     [1] = ACTION_LAYER_MOMENTARY(1),                      // FN1 - push Layer1
-    [2] = ACTION_DEFAULT_LAYER_SET(2),                    // FN2 - switch to Layer2
+    [2] = ACTION_LAYER_MOMENTARY(2),                      // FN2 - switch to Layer2
     [3] = ACTION_LAYER_MOMENTARY(3),                      // FN3 - push Layer3
     [4] = ACTION_LAYER_TAP_KEY(1, KC_SPACE),              // FN4 - hold=layer1, tap=spc
     [5] = ACTION_MODS_KEY(MOD_LGUI, KC_TAB),              // FN5 - mod-tab
