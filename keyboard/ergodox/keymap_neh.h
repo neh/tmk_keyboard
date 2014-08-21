@@ -4,9 +4,9 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         // left hand
           NO,    1,    2,    3,    4,    5,   NO,
          TAB, QUOT, COMM,  DOT,    P,    Y,  TAB,
-        VOLU,    A,    O,    E,    U,    I,
-        VOLD, SCLN,    Q,    J,    K,    X,  ENT,
-        MUTE,   NO,  FN2,  FN3, LGUI,
+          NO,    A,    O,    E,    U,    I,
+          NO, SCLN,    Q,    J,    K,    X,  ENT,
+          NO,   NO,  FN2,  FN3, LGUI,
                                        DEL,  FN5,
                                               NO,
                                  FN9,  FN6,  FN1,
