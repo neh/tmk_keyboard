@@ -12,7 +12,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                                  FN9,  FN6,  FN1,
         // right hand
               NO,    6,    7,    8,    9,    0,   NO,
-            BSPC,    F,    G,    C,    R,    L,   NO,
+            FN13,    F,    G,    C,    R,    L,   NO,
                      D,    H,    T,    N,    S, MINS,
              ENT,    B,    M,    W,    V,    Z,   NO,
                         LGUI,  FN3,   NO,  INS,   NO,
@@ -176,6 +176,7 @@ enum function_id {
     TEENSY_KEY,
     SHIFTED_ARROW,
     SHIFTED_KEY,
+    SHIFTED_BACKSPACE,
 };
 
 enum macro_id {
@@ -200,6 +201,7 @@ static const uint16_t PROGMEM fn_actions[] = {
     [10] = ACTION_FUNCTION(SHIFTED_ARROW),                // Shift + Arrows = special
     [11] = ACTION_MODS_KEY(MOD_LGUI, KC_F12),             // Mod-F12
     [12] = ACTION_FUNCTION(SHIFTED_KEY),                  // Shift + Arrows = special
+    [13] = ACTION_FUNCTION(SHIFTED_BACKSPACE),            // Shift + BkSpc = Del
 
     [19] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),             // ~
 
@@ -274,6 +276,15 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
                     keycode = shift_pressed ? KC_END : KC_RIGHT;
                     break;
             }
+            action.code = ACTION_KEY(keycode);
+            action.key.mods = 0;
+            del_mods(MOD_LSFT | MOD_RSFT);
+            neh_hotkey(record, action);
+            set_mods(savedmods);
+            break;
+
+        case SHIFTED_BACKSPACE:
+            keycode = shift_pressed ? KC_DELETE : KC_BSPACE;
             action.code = ACTION_KEY(keycode);
             action.key.mods = 0;
             del_mods(MOD_LSFT | MOD_RSFT);
