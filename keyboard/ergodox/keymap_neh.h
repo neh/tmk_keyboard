@@ -180,7 +180,7 @@ enum function_id {
 };
 
 enum macro_id {
-    LSHIFT_LEFT,
+    NOTHING_HERE,
 };
 
 /*
@@ -401,14 +401,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt)
     tap_t tap = record->tap;
 
     switch (id) {
-        case LSHIFT_LEFT:
-            if (tap.count > 0 && !tap.interrupted) {
-                return (event.pressed ?
-                        MACRO( D(HOME), U(HOME), END ) : MACRO_NONE);
-            } else {
-                return (event.pressed ?
-                        MACRO( D(LSHIFT), END ) : MACRO( U(LSHIFT), END ) );
-            }
+        default:
+            return MACRO_NONE;
     }
-    return MACRO_NONE;
 }
