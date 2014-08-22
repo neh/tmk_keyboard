@@ -18,7 +18,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                         LGUI,  FN3,   NO,  INS,   NO,
               NO,   NO,
               NO,
-            LALT,  FN8,  FN4
+            LALT, FN14,  SPC
     ),
 
     KEYMAP(  // layout: layer 1: Punctuation
@@ -28,8 +28,8 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
           NO, FN27, BSLS, SLSH, MINS, FN20,
           NO, FN12,  GRV, FN29, FN30, LBRC, TRNS,
           NO,   NO,   NO, TRNS, TRNS,
-                                      TRNS,   NO,
-                                              NO,
+                                      TRNS, TRNS,
+                                            TRNS,
                                 TRNS, TRNS, TRNS,
         // right hand
               NO, FN12, FN12, FN12, FN12, FN12, SLEP,
@@ -37,8 +37,8 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
                   FN21, FN10, FN10, FN10, FN10, FN12,
             TRNS, RBRC, FN31, FN19,   NO,   NO,   NO,
                         TRNS, TRNS,   NO,   NO,   NO,
-              NO, TRNS,
-              NO,
+            TRNS, TRNS,
+            TRNS,
             TRNS, TRNS, TRNS
     ),
 
@@ -177,6 +177,7 @@ enum function_id {
     SHIFTED_ARROW,
     SHIFTED_KEY,
     SHIFTED_BACKSPACE,
+    L1_BACKSPACE_DEL,
 };
 
 enum macro_id {
@@ -202,6 +203,7 @@ static const uint16_t PROGMEM fn_actions[] = {
     [11] = ACTION_MODS_KEY(MOD_LGUI, KC_F12),             // Mod-F12
     [12] = ACTION_FUNCTION(SHIFTED_KEY),                  // Shift + Arrows = special
     [13] = ACTION_FUNCTION(SHIFTED_BACKSPACE),            // Shift + BkSpc = Del
+    [14] = ACTION_FUNCTION_TAP(L1_BACKSPACE_DEL),         // L1, BkSpc, and Del
 
     [19] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),             // ~
 
@@ -251,6 +253,7 @@ void neh_hotkey(keyrecord_t *record, action_t action)
 void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
 {
     keyevent_t event = record->event;
+    tap_t tap = record->tap;
 
     uint8_t col = event.key.col;
     uint8_t row = event.key.row;
@@ -281,6 +284,19 @@ void action_function(keyrecord_t *record, uint8_t id, uint8_t opt)
             del_mods(MOD_LSFT | MOD_RSFT);
             neh_hotkey(record, action);
             set_mods(savedmods);
+            break;
+
+        case L1_BACKSPACE_DEL:
+            if (tap.count == 0 || tap.interrupted) {
+                event.pressed ? layer_on(1) : layer_off(1);
+            } else {
+                keycode = shift_pressed ? KC_DELETE : KC_BSPACE;
+                action.code = ACTION_KEY(keycode);
+                action.key.mods = 0;
+                del_mods(MOD_LSFT | MOD_RSFT);
+                neh_hotkey(record, action);
+                set_mods(savedmods);
+            }
             break;
 
         case SHIFTED_BACKSPACE:
