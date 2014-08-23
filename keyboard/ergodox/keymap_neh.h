@@ -6,7 +6,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
          TAB, QUOT, COMM,  DOT,    P,    Y,  TAB,
           NO,    A,    O,    E,    U,    I,
           NO, SCLN,    Q,    J,    K,    X,  ENT,
-          NO,  INS,  FN2,  FN3, LGUI,
+          NO,  INS,  FN2,  FN3, FN15,
                                        DEL,  FN5,
                                               NO,
                                  FN9,  FN6,  FN1,
@@ -15,7 +15,7 @@ static const uint8_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
             FN13,    F,    G,    C,    R,    L,   NO,
                      D,    H,    T,    N,    S, MINS,
              ENT,    B,    M,    W,    V,    Z,   NO,
-                        LGUI,  FN3,   NO,  INS,   NO,
+                        FN15,  FN3,   NO,  INS,   NO,
               NO,   NO,
               NO,
             LALT, FN14,  SPC
@@ -204,6 +204,7 @@ static const uint16_t PROGMEM fn_actions[] = {
     [12] = ACTION_FUNCTION(SHIFTED_KEY),                  // Shift + Arrows = special
     [13] = ACTION_FUNCTION(SHIFTED_BACKSPACE),            // Shift + BkSpc = Del
     [14] = ACTION_FUNCTION_TAP(L1_BACKSPACE_DEL),         // L1, BkSpc, and Del
+    [15] = ACTION_MODS_TAP_KEY(MOD_LGUI, KC_TAB),         // hold=LGUI, tap=Tab
 
     [19] = ACTION_MODS_KEY(MOD_LSFT, KC_GRV),             // ~
 
